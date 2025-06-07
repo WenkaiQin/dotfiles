@@ -57,6 +57,18 @@ install_zsh_plugins() {
     echo "💡 Installing zsh-autosuggestions..."
     git clone https://github.com/zsh-users/zsh-autosuggestions "${HOME}/.zsh/zsh-autosuggestions"
   fi
+  # Install Pure prompt
+  if [ "$platform" = "mac" ]; then
+    if ! brew list pure &>/dev/null; then
+      echo "🌟 Installing pure via Homebrew..."
+      brew install pure
+    fi
+  else
+    if [ ! -d "${HOME}/.zsh/pure" ]; then
+      echo "🌟 Installing pure prompt manually..."
+      git clone https://github.com/sindresorhus/pure.git "${HOME}/.zsh/pure"
+    fi
+  fi
 }
 
 # Symlink dotfiles
