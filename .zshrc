@@ -31,9 +31,22 @@ export TEXINPUTS=~/Workspace/pangea/texStyleFiles:
 # Source prompt.
 # source ~/agkozak-zsh-prompt.plugin.zsh
 
+# Add Pure prompt path depending on platform
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS (Homebrew install path)
+    fpath+=("/opt/homebrew/share/zsh/site-functions")
+elif [[ -d "$HOME/.zsh/pure" ]]; then
+    # Linux manual install path
+    fpath+=("$HOME/.zsh/pure")
+fi
+
 if command -v brew &>/dev/null; then
   fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fi
+
+autoload -U promptinit; promptinit
+prompt pure
+
 autoload -U promptinit; promptinit;
 zstyle :prompt:pure:git:stash show yes
 prompt pure
