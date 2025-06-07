@@ -8,9 +8,20 @@ setopt nomenucomplete
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
 alias ls='ls --color=auto'
-alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
 alias latexindent='~/latexindent-macos'
 alias find='find 2>/dev/null'
+
+# Sublime Text alias (cross-platform)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
+elif command -v subl &>/dev/null; then
+    # Linux with subl in PATH
+    alias subl="subl"
+elif [[ -x "/opt/sublime_text/sublime_text" ]]; then
+    # Linux default install path
+    alias subl="/opt/sublime_text/sublime_text"
+fi
 
 # Pangea stuff.
 export BIBINPUTS=~/Workspace/pangea/:
