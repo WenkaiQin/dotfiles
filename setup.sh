@@ -1,39 +1,71 @@
 #!/bin/bash
 
-set -e  # Exit on error
+set -e
 
-REPO_URL="git@github.com:WenkaiQin/dotfiles.git"
+echo "🛠️  Starting dotfiles setup..."
+
+# Determine OS type
+OS_TYPE="$(uname -s)"
+case "$OS_TYPE" in
+    Linux*)     platform=linux;;
+    Darwin*)    platform=mac;;
+    *)          echo "Unsupported platform: $OS_TYPE"; exit 1;;
+esac
+echo "Detected platform: $platform"
+
+# Set up dotfiles directory
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 FILES_TO_LINK=(
   ".zshrc"
   "agkozak-zsh-prompt.plugin.zsh"
 )
 
-# Backup function
+# Backup existing files
 backup_file() {
   local file="$1"
   if [ -f "$file" ] || [ -L "$file" ]; then
     mv "$file" "${file}.bak.$(date +%s)"
-    echo "Backed up existing $file"
+    echo "🔁 Backed up existing $file"
   fi
 }
 
-# Clone dotfiles repo
-if [ ! -d "$DOTFILES_DIR/.git" ]; then
-  echo "Cloning dotfiles repo..."
-  git clone "$REPO_URL" "$DOTFILES_DIR"
-else
-  echo "Dotfiles repo already exists, pulling latest changes..."
-  git -C "$DOTFILES_DIR" pull
-fi
+# Install base packages
+install_packages() {
+  echo "📦 Installing required packages..."
+  if [ "$platform" = "linux" ]; then
+    sudo apt update && sudo apt install -y zsh git curl
+  elif [ "$platform" = "mac" ]; then
+    if ! command -v brew >/dev/null; then
+      echo "🍺 Installing Homebrew..."
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    brew install zsh git curl
+  fi
+}
 
-# Link files
+# Install Zsh plugins
+install_zsh_plugins() {
+  mkdir -p ~/.zsh
+
+  if [ ! -d "${HOME}/.zsh/zsh-syntax-highlighting" ]; then
+    echo "✨ Installing zsh-syntax-highlighting..."
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${HOME}/.zsh/zsh-syntax-highlighting"
+  fi
+
+  if [ ! -d "${HOME}/.zsh/zsh-autosuggestions" ]; then
+    echo "💡 Installing zsh-autosuggestions..."
+    git clone https://github.com/zsh-users/zsh-autosuggestions "${HOME}/.zsh/zsh-autosuggestions"
+  fi
+}
+
+# Symlink dotfiles
 for filename in "${FILES_TO_LINK[@]}"; do
   target="$HOME/$filename"
   source="$DOTFILES_DIR/$filename"
 
   if [ ! -e "$source" ]; then
-    echo "Warning: $source does not exist. Skipping."
+    echo "⚠️  Warning: $source not found. Skipping."
     continue
   fi
 
@@ -42,7 +74,19 @@ for filename in "${FILES_TO_LINK[@]}"; do
   fi
 
   ln -s "$source" "$target"
-  echo "Linked $target -> $source"
+  echo "🔗 Linked $target → $source"
 done
 
+# Install packages and plugins
+install_packages
+install_zsh_plugins
+
+# Change shell to Zsh
+ZSH_PATH="$(command -v zsh)"
+if [ "$SHELL" != "$ZSH_PATH" ]; then
+  echo "🌀 Changing default shell to Zsh ($ZSH_PATH)..."
+  chsh -s "$ZSH_PATH"
+fi
+
 echo "✅ Dotfiles setup complete."
+echo "📎 Restart your terminal or run: exec $ZSH_PATH"
