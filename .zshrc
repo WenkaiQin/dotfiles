@@ -20,13 +20,19 @@ export TEXINPUTS=~/Workspace/pangea/texStyleFiles:
 # Source prompt.
 # source ~/agkozak-zsh-prompt.plugin.zsh
 
-fpath+=("$(brew --prefix)/share/zsh/site-functions")
+if command -v brew &>/dev/null; then
+  fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fi
 autoload -U promptinit; promptinit;
 zstyle :prompt:pure:git:stash show yes
 prompt pure
 
 # Syntax highlighting.
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
 
 # eval "$(starship init zsh)"
 
@@ -47,4 +53,3 @@ function set_terminal_title() {
 
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
-
