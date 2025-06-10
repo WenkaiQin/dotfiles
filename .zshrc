@@ -77,3 +77,7 @@ function set_terminal_title() {
 
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
+
+if [[ "$(hostname)" == "842f572ea37e" ]]; then
+  export PATH=$HOME/.toolbox/bin:$PATH
+fi
