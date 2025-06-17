@@ -39,8 +39,8 @@ echo "✅ Found Snazzy profile: $SNAZZY_UUID"
 echo "📌 Setting Snazzy as the default GNOME Terminal profile..."
 gsettings set org.gnome.Terminal.ProfilesList default "$SNAZZY_UUID"
 
-echo "🖋️ Setting font to Menlo 12..."
-gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$SNAZZY_UUID/" font 'Menlo 12'
+echo "🖋️ Setting font to Monospace 12..."
+gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$SNAZZY_UUID/" font 'Monospace 12'
 gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$SNAZZY_UUID/" use-system-font false
 
 echo "🎉 Done! Open GNOME Terminal and enjoy the Snazzy theme."
