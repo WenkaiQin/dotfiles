@@ -81,4 +81,6 @@ if [[ "$(hostname)" == "842f572ea37e" ]]; then
   export PATH=$HOME/.toolbox/bin:$PATH
 fi
 
-eval "$(pyenv init --path)"
+# eval "$(pyenv init --path)"
+
+export PATH=$HOME/.toolbox/bin:$PATH
