@@ -9,8 +9,10 @@ sudo apt install -y dconf-cli uuid-runtime wget curl
 
 # Download and run the Gogh installer script, selecting the 'Snazzy' theme
 echo "🎨 Installing Snazzy theme for GNOME Terminal using Gogh..."
-export TERMINAL=gnome-terminal
-bash -c  "$(wget -qO- https://git.io/vQgMr)" <<< sleep 5 <<< "291" 
+(
+    sleep 5
+    echo "291"
+) | bash -c "$(wget -qO- https://git.io/vQgMr)"
 
 # Give GNOME Terminal some time to register the new profile
 sleep 1
