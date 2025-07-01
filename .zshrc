@@ -140,3 +140,6 @@ sync-history() {
     builtin fc -AI
 }
 add-zsh-hook precmd sync-history
+# Amazon-specific.
+export PATH=$HOME/.toolbox/bin:$PATH
+source $HOME/.brazil_completion/zsh_completion
