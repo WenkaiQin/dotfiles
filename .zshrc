@@ -84,3 +84,4 @@ fi
 # eval "$(pyenv init --path)"
 
 export PATH=$HOME/.toolbox/bin:$PATH
+source /Users/qjwenkai/.brazil_completion/zsh_completion
