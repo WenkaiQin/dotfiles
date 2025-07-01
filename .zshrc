@@ -80,3 +80,12 @@ export SL_AWS=s3://ssa-external-upload-mini-gnss-production
 if [[ "$(hostname)" == "842f572ea37e" ]]; then
   export PATH=$HOME/.toolbox/bin:$PATH
 fi
+
+# Fix Ctrl+Arrow and Alt+Arrow keys in zsh
+autoload -Uz select-word-style
+select-word-style bash
+
+bindkey "^[[1;5D" backward-word       # Ctrl+Left
+bindkey "^[[1;5C" forward-word        # Ctrl+Right
+bindkey "^[^[[D" backward-word        # Alt+Left
+bindkey "^[^[[C" forward-word         # Alt+Right
