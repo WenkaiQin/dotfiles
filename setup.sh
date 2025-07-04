@@ -44,7 +44,24 @@ install_packages() {
   fi
 }
 
-# Install Zsh plugins
+# Install fzf
+install_fzf() {
+  if command -v fzf >/dev/null 2>&1; then
+    echo "✅ fzf already installed"
+    return
+  fi
+
+  echo "🔍 Installing fzf..."
+  if [ "$platform" = "mac" ]; then
+    brew install fzf
+    "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc
+  else
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install --key-bindings --completion --no-update-rc
+  fi
+}
+
+# Install zsh plugins
 install_zsh_plugins() {
   mkdir -p ~/.zsh
 
@@ -57,7 +74,7 @@ install_zsh_plugins() {
     echo "💡 Installing zsh-autosuggestions..."
     git clone https://github.com/zsh-users/zsh-autosuggestions "${HOME}/.zsh/zsh-autosuggestions"
   fi
-  # Install Pure prompt
+
   if [ "$platform" = "mac" ]; then
     if ! brew list pure &>/dev/null; then
       echo "🌟 Installing pure via Homebrew..."
@@ -69,6 +86,21 @@ install_zsh_plugins() {
       git clone https://github.com/sindresorhus/pure.git "${HOME}/.zsh/pure"
     fi
   fi
+}
+
+# Install Snazzy theme
+install_snazzy_theme() {
+    echo "🎨 Installing Snazzy terminal theme..."
+
+    if [ "$platform" = "mac" ]; then
+        echo "🧠 macOS detected — using Terminal.app installer"
+        bash "$DOTFILES_DIR/install_snazzy_mac.sh"
+    elif [ "$platform" = "linux" ]; then
+        echo "🧠 Linux detected — using GNOME Terminal installer"
+        bash "$DOTFILES_DIR/install_snazzy_gnome.sh"
+    else
+        echo "⚠️ Unsupported platform for Snazzy installation."
+    fi
 }
 
 # Symlink dotfiles
@@ -89,9 +121,11 @@ for filename in "${FILES_TO_LINK[@]}"; do
   echo "🔗 Linked $target → $source"
 done
 
-# Install packages and plugins
+# Install packages, plugins, and fzf
 install_packages
 install_zsh_plugins
+install_fzf
+install_snazzy_theme
 
 # Change shell to Zsh
 ZSH_PATH="$(command -v zsh)"
