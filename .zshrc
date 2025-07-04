@@ -69,16 +69,13 @@ setopt EXTENDED_HISTORY
 # Allow for changing of title.
 DISABLE_AUTO_TITLE="true"
 
-function set_terminal_title() {
-  echo -en "\e]2;$@\a"
-}
-
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
 
 # Amazon-specific.
 if [[ "$(hostname)" == "842f572ea37e" ]]; then
   export PATH=$HOME/.toolbox/bin:$PATH
+  source /Users/qjwenkai/.brazil_completion/zsh_completion
 fi
 
 # Fix Ctrl+Arrow and Alt+Arrow keys in zsh
@@ -90,8 +87,4 @@ bindkey "^[[1;5C" forward-word        # Ctrl+Right
 bindkey "^[^[[D" backward-word        # Alt+Left
 bindkey "^[^[[C" forward-word         # Alt+Right
 
-
-# eval "$(pyenv init --path)"
-
 export PATH=$HOME/.toolbox/bin:$PATH
-source /Users/qjwenkai/.brazil_completion/zsh_completion
