@@ -7,9 +7,16 @@ setopt nomenucomplete
 
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
-alias ls='ls --color=auto'
 alias latexindent='~/latexindent-macos'
 alias find='find 2>/dev/null'
+alias git-log='git log --graph --abbrev-commit --oneline --decorate --all'
+
+# ls with color support. (cross-platform)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias ls='ls -G'
+else
+    alias ls='ls --color=auto'
+fi
 
 # Sublime Text alias (cross-platform)
 if [[ "$OSTYPE" == "darwin"* ]]; then
