@@ -59,19 +59,13 @@ elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; th
 fi
 
 # History settings.
-export HISTSIZE=10000
-export SAVEHIST=10000
-export HISTFILE=~/.zhistory
+export HISTSIZE=50000
+export SAVEHIST=50000
 setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt EXTENDED_HISTORY
-
-# Allow for changing of title.
-DISABLE_AUTO_TITLE="true"
-
-function set_terminal_title() {
-  echo -en "\e]2;$@\a"
-}
+setopt HIST_REDUCE_BLANKS
+setopt SHARE_HISTORY
 
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
@@ -85,7 +79,12 @@ fi
 autoload -Uz select-word-style
 select-word-style bash
 
-bindkey "^[[1;5D" backward-word       # Ctrl+Left
-bindkey "^[[1;5C" forward-word        # Ctrl+Right
-bindkey "^[^[[D" backward-word        # Alt+Left
-bindkey "^[^[[C" forward-word         # Alt+Right
+# Ctrl + Arrow
+bindkey "^[[1;5D" backward-word  # Ctrl+Left
+bindkey "^[[1;5C" forward-word   # Ctrl+Right
+
+# Alt + Arrow
+bindkey "^[^[[D" backward-word   # Alt+Left
+bindkey "^[^[[C" forward-word    # Alt+Right
+bindkey "^[[1;3D" backward-word   # Alt+Left
+bindkey "^[[1;3C" forward-word    # Alt+Right
