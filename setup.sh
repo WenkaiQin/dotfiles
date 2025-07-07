@@ -19,6 +19,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FILES_TO_LINK=(
   ".zshrc"
   "agkozak-zsh-prompt.plugin.zsh"
+  ".gitignore_global"
 )
 
 # Backup existing files
