@@ -20,6 +20,7 @@ curl -fsSL -o "$THEME_PATH" "$THEME_URL"
 
 echo "📂 Importing the theme into Terminal.app..."
 open "$THEME_PATH"
+echo "🧼 You may close the extra Terminal window that opened when importing the theme."
 
 # Give Terminal time to register the theme
 sleep 2

@@ -95,7 +95,7 @@ install_snazzy_theme() {
 
     if [ "$platform" = "mac" ]; then
         echo "🧠 macOS detected — using Terminal.app installer"
-        bash "$DOTFILES_DIR/install_snazzy_mac.sh"
+        bash "$DOTFILES_DIR/install_snazzy_darwin.sh"
     elif [ "$platform" = "linux" ]; then
         echo "🧠 Linux detected — using GNOME Terminal installer"
         bash "$DOTFILES_DIR/install_snazzy_gnome.sh"
