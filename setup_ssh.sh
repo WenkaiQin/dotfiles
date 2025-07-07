@@ -29,12 +29,16 @@ sudo systemctl enable ssh
 sudo systemctl start ssh
 
 echo "[+] Checking firewall (ufw)..."
-if sudo ufw status | grep -q "Status: active"; then
-    echo "[+] UFW is active. Allowing SSH..."
-    sudo ufw allow ssh
-    sudo ufw reload
+if command -v ufw >/dev/null; then
+    if sudo ufw status | grep -q "Status: active"; then
+        echo "[+] UFW is active. Allowing SSH..."
+        sudo ufw allow ssh
+        sudo ufw reload
+    else
+        echo "[!] UFW is not active. Skipping firewall configuration."
+    fi
 else
-    echo "[!] UFW is not active. Skipping firewall configuration."
+    echo "[!] UFW is not installed. Skipping firewall configuration."
 fi
 
 # Optional hardening
