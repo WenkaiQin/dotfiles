@@ -1,4 +1,4 @@
-# Autocomplete fixing.
+# Autocomplete tweaking.
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
 
@@ -7,18 +7,17 @@ setopt nomenucomplete
 
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
-alias latexindent='~/latexindent-macos'
 alias find='find 2>/dev/null'
 alias git-log='git log --graph --abbrev-commit --oneline --decorate --all'
 
-# ls with color support. (cross-platform)
+# ls with color support.
 if [[ "$OSTYPE" == "darwin"* ]]; then
     alias ls='ls -G'
 else
     alias ls='ls --color=auto'
 fi
 
-# Sublime Text alias (cross-platform)
+# Sublime Text alias.
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
@@ -35,10 +34,7 @@ export BIBINPUTS=~/Workspace/pangea/:
 export BSTINPUTS=~/Workspace/pangea/texStyleFiles:
 export TEXINPUTS=~/Workspace/pangea/texStyleFiles:
 
-# Source prompt.
-# source ~/agkozak-zsh-prompt.plugin.zsh
-
-# Add Pure prompt path depending on platform
+# Add Pure prompt path depending on platform.
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS (Homebrew install path)
     fpath+=("/opt/homebrew/share/zsh/site-functions")
