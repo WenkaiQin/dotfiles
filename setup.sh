@@ -20,9 +20,10 @@ FILES_TO_LINK=(
   ".zshrc"
   # "agkozak-zsh-prompt.plugin.zsh" # No longer used, replaced by pure
   ".gitignore_global"
+  ".gitconfig"
 )
 
-# Backup existing files
+# Backup an existing file.
 backup_file() {
   local file="$1"
   if [ -f "$file" ] || [ -L "$file" ]; then
@@ -31,34 +32,56 @@ backup_file() {
   fi
 }
 
-# Install base packages
+# Install base packages.
 install_packages() {
   echo "📦 Installing required packages..."
-  if [ "$platform" = "linux" ]; then
-    sudo apt update && sudo apt install -y zsh git curl
-  elif [ "$platform" = "mac" ]; then
-    if ! command -v brew >/dev/null; then
+
+
+  if [[ "$platform" == "linux" ]]; then
+    REQUIRED_PKGS=(zsh git curl)
+    sudo apt update
+    for pkg in "${REQUIRED_PKGS[@]}"; do
+      if dpkg -s "$pkg" &>/dev/null; then
+        echo "✅ $pkg already installed"
+      else
+        echo "📦 Installing $pkg..."
+        sudo apt install -y "$pkg"
+      fi
+    done
+
+  elif [[ "$platform" == "mac" ]]; then
+    REQUIRED_PKGS=(git curl)
+    if ! command -v brew &>/dev/null; then
       echo "🍺 Installing Homebrew..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-    brew install zsh git curl
+
+    for pkg in "${REQUIRED_PKGS[@]}"; do
+      if brew list "$pkg" &>/dev/null; then
+        echo "✅ $pkg already installed"
+      else
+        echo "📦 Installing $pkg..."
+        brew install "$pkg"
+      fi
+    done
   fi
 }
 
 # Install fzf
 install_fzf() {
-  if command -v fzf >/dev/null 2>&1; then
-    echo "✅ fzf already installed"
-    return
-  fi
-
   echo "🔍 Installing fzf..."
-  if [ "$platform" = "mac" ]; then
-    brew install fzf
-    "$(brew --prefix)/opt/fzf/install" --key-bindings --completion --no-update-rc
+  if command -v fzf &>/dev/null; then
+    echo "✅ fzf already installed"
   else
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --key-bindings --completion --no-update-rc
+    brew install fzf
+  fi
+  # Run the optional install script for keybindings and completion
+  FZF_INSTALL_SCRIPT="$(brew --prefix)/opt/fzf/install"
+  if [[ -x "$FZF_INSTALL_SCRIPT" ]]; then
+    echo "⚙️  Setting up fzf key bindings and completions..."
+    "$FZF_INSTALL_SCRIPT" --key-bindings --completion --no-update-rc  &>/dev/null
+  else
+    echo "⚠️  fzf install script not found at $FZF_INSTALL_SCRIPT"
   fi
 }
 
@@ -95,7 +118,7 @@ install_snazzy_theme() {
 
     if [ "$platform" = "mac" ]; then
         echo "🧠 macOS detected — using Terminal.app installer"
-        bash "$DOTFILES_DIR/install_snazzy_darwin.sh"
+        bash "$DOTFILES_DIR/install_snazzy_mac.sh"
     elif [ "$platform" = "linux" ]; then
         echo "🧠 Linux detected — using GNOME Terminal installer"
         bash "$DOTFILES_DIR/install_snazzy_gnome.sh"
@@ -122,11 +145,35 @@ for filename in "${FILES_TO_LINK[@]}"; do
   echo "🔗 Linked $target → $source"
 done
 
+# Ensure Zsh completion cache directory exists
+ZSH_CACHE_DIR="$HOME/.zsh/cache"
+if [ ! -d "$ZSH_CACHE_DIR" ]; then
+  echo "📂 Creating Zsh completion cache directory at $ZSH_CACHE_DIR"
+  mkdir -p "$ZSH_CACHE_DIR"
+else
+  echo "✅ Zsh completion cache directory already exists"
+fi
+
 # Install packages, plugins, and fzf
 install_packages
 install_zsh_plugins
 install_fzf
 install_snazzy_theme
+
+# Ensure ~/.gitconfig.local exists with user identity
+if [[ ! -f "$HOME/.gitconfig.local" ]]; then
+  echo "🧾 Setting up ~/.gitconfig.local (Git identity for this machine):"
+  read -r -p "  Git user.name: " git_name
+  read -r -p "  Git user.email: " git_email
+
+  cat > "$HOME/.gitconfig.local" <<EOF
+[user]
+    name = $git_name
+    email = $git_email
+EOF
+
+  echo "✅ ~/.gitconfig.local created."
+fi
 
 # Change shell to Zsh
 ZSH_PATH="$(command -v zsh)"

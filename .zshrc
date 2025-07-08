@@ -1,9 +1,29 @@
 # Autocomplete tweaking.
+# Brew autocomplete.
+if command -v brew &>/dev/null; then
+    fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fi
+
+# Enable completion cache.
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path ~/.zsh/cache
+
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
 
 setopt noautomenu
 setopt nomenucomplete
+
+# Enable fzf keybindings for zsh.
+if command -v fzf &>/dev/null; then
+    if [[ -f ~/.fzf.zsh ]]; then
+        source ~/.fzf.zsh
+    else
+        echo "⚠️  fzf installed, but ~/.fzf.zsh not found. Did you run the install script with --key-bindings?"
+    fi
+else
+    echo "fzf not found. Install fzf for fuzzy finding capabilities."
+fi
 
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
@@ -28,7 +48,6 @@ elif [[ -x "/opt/sublime_text/sublime_text" ]]; then
     # Linux default install path
     alias subl="/opt/sublime_text/sublime_text"
 fi
-
 # Pangea stuff.
 export BIBINPUTS=~/Workspace/pangea/:
 export BSTINPUTS=~/Workspace/pangea/texStyleFiles:
@@ -72,11 +91,6 @@ setopt SHARE_HISTORY
 
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
-
-# Amazon-specific.
-if [[ "$(hostname)" == "842f572ea37e" ]]; then
-  export PATH=$HOME/.toolbox/bin:$PATH
-fi
 
 # Fix Ctrl+Arrow and Alt+Arrow keys in zsh
 autoload -Uz select-word-style

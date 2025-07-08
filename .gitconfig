@@ -1,0 +1,12 @@
+[merge]
+    tool = bc
+[core]
+	excludesfile = ~/.gitignore_global
+    editor = vim
+    autocrlf = input
+[color]
+    ui = auto
+[pull]
+    ff = only
+[include]
+    path = ~/.gitconfig.local
