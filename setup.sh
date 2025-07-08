@@ -18,7 +18,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 FILES_TO_LINK=(
   ".zshrc"
-  "agkozak-zsh-prompt.plugin.zsh"
+  # "agkozak-zsh-prompt.plugin.zsh" # No longer used, replaced by pure
   ".gitignore_global"
 )
 
