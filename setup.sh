@@ -70,21 +70,31 @@ install_packages() {
 # Install fzf
 install_fzf() {
   echo "🔍 Installing fzf..."
+
   if command -v fzf &>/dev/null; then
     echo "✅ fzf already installed"
   else
-    brew install fzf
+    if [[ "$platform" == "mac" ]]; then
+      brew install fzf
+    elif [[ "$platform" == "linux" ]]; then
+      git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+      ~/.fzf/install --key-bindings --completion --no-update-rc &>/dev/null
+    fi
   fi
-  # Run the optional install script for keybindings and completion
-  FZF_INSTALL_SCRIPT="$(brew --prefix)/opt/fzf/install"
-  if [[ -x "$FZF_INSTALL_SCRIPT" ]]; then
-    echo "⚙️  Setting up fzf key bindings and completions..."
-    "$FZF_INSTALL_SCRIPT" --key-bindings --completion --no-update-rc  &>/dev/null
+
+  # Run the optional install script for macOS (Homebrew install)
+  if [[ "$platform" == "mac" ]]; then
+    FZF_INSTALL_SCRIPT="$(brew --prefix)/opt/fzf/install"
+    if [[ -x "$FZF_INSTALL_SCRIPT" ]]; then
+      echo "⚙️  Setting up fzf key bindings and completions..."
+      "$FZF_INSTALL_SCRIPT" --key-bindings --completion --no-update-rc &>/dev/null
+    else
+      echo "⚠️  fzf install script not found at $FZF_INSTALL_SCRIPT"
+    fi
+
     echo "⚠️  IMPORTANT: Enable 'Use Option as Meta' in Terminal.app:"
     echo "  Terminal → Preferences → Profile → Keyboard → Check 'Use Option as Meta Key'"
     read -n 1 -r -s -p $'Press any key once done...\n'
-  else
-    echo "⚠️  fzf install script not found at $FZF_INSTALL_SCRIPT"
   fi
 }
 
