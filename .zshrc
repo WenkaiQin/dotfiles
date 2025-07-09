@@ -14,15 +14,13 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
 setopt noautomenu
 setopt nomenucomplete
 
-# Enable fzf keybindings for zsh.
-if command -v fzf &>/dev/null; then
-    if [[ -f ~/.fzf.zsh ]]; then
-        source ~/.fzf.zsh
-    else
-        echo "⚠️  fzf installed, but ~/.fzf.zsh not found. Did you run the install script with --key-bindings?"
-    fi
+# Enable fzf key bindings and completions if available
+if [[ -f ~/.fzf.zsh ]]; then
+    source ~/.fzf.zsh
+elif ! command -v fzf &>/dev/null; then
+    echo "⚠️  fzf not found. Install it to enable fuzzy finding features."
 else
-    echo "fzf not found. Install fzf for fuzzy finding capabilities."
+    echo "⚠️  fzf installed but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
 fi
 
 # Additional arguments for common commands.

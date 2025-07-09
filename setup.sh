@@ -77,7 +77,13 @@ install_fzf() {
     if [[ "$platform" == "mac" ]]; then
       brew install fzf
     elif [[ "$platform" == "linux" ]]; then
-      git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+      if [ -d "$HOME/.fzf" ]; then
+        echo "🔁 Updating existing ~/.fzf..."
+        (cd "$HOME/.fzf" && git pull)
+      else
+        echo "⬇️  Cloning fzf..."
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+      fi
       ~/.fzf/install --key-bindings --completion --no-update-rc &>/dev/null
     fi
   fi
