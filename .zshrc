@@ -81,6 +81,7 @@ elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; th
 fi
 
 # History settings.
+export HISTFILE=~/.zsh_history
 export HISTSIZE=50000
 export SAVEHIST=50000
 setopt INC_APPEND_HISTORY
