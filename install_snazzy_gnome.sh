@@ -2,6 +2,25 @@
 
 set -e
 
+# Check for existing Snazzy profile first
+echo "🔍 Checking for existing Snazzy GNOME Terminal profile..."
+EXISTING_UUID=""
+PROFILE_LIST=$(gsettings get org.gnome.Terminal.ProfilesList list | tr -d "[],'")
+
+for PROFILE_ID in $PROFILE_LIST; do
+    NAME=$(gsettings get "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE_ID/" visible-name | tr -d "'")
+    if [[ "$NAME" == "Snazzy" ]]; then
+        EXISTING_UUID="$PROFILE_ID"
+        break
+    fi
+done
+
+if [[ -n "$EXISTING_UUID" ]]; then
+    echo "✅ Snazzy profile already exists (UUID: $EXISTING_UUID). Skipping installation."
+    gsettings set org.gnome.Terminal.ProfilesList default "$EXISTING_UUID"
+    exit 0
+fi
+
 # Update package lists and install required dependencies
 echo "🔧 Installing dependencies..."
 sudo apt update

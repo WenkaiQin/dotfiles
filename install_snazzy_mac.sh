@@ -8,6 +8,16 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
     exit 1
 fi
 
+# Don't install if the theme already exists.
+THEME_NAME="Snazzy"
+PLIST="$HOME/Library/Preferences/com.apple.Terminal.plist"
+
+/usr/libexec/PlistBuddy -c "Print 'Window Settings':$THEME_NAME" "$PLIST" &>/dev/null
+if [[ $? -eq 0 ]]; then
+    echo "✅ Terminal profile '$THEME_NAME' already exists. Skipping installation."
+    exit 0
+fi
+
 # Download Snazzy theme for Terminal.app
 THEME_URL="https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/terminal/Snazzy.terminal"
 THEME_NAME="Snazzy"

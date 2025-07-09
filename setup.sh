@@ -80,6 +80,9 @@ install_fzf() {
   if [[ -x "$FZF_INSTALL_SCRIPT" ]]; then
     echo "⚙️  Setting up fzf key bindings and completions..."
     "$FZF_INSTALL_SCRIPT" --key-bindings --completion --no-update-rc  &>/dev/null
+    echo "⚠️  IMPORTANT: Enable 'Use Option as Meta' in Terminal.app:"
+    echo "  Terminal → Preferences → Profile → Keyboard → Check 'Use Option as Meta Key'"
+    read -n 1 -r -s -p $'Press any key once done...\n'
   else
     echo "⚠️  fzf install script not found at $FZF_INSTALL_SCRIPT"
   fi

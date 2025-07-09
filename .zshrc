@@ -28,7 +28,6 @@ fi
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
 alias find='find 2>/dev/null'
-alias git-log='git log --graph --abbrev-commit --oneline --decorate --all'
 
 # ls with color support.
 if [[ "$OSTYPE" == "darwin"* ]]; then
