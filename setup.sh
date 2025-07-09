@@ -36,12 +36,11 @@ backup_file() {
 install_packages() {
   echo "📦 Installing required packages..."
 
-
   if [[ "$platform" == "linux" ]]; then
     REQUIRED_PKGS=(zsh git curl)
     sudo apt update
     for pkg in "${REQUIRED_PKGS[@]}"; do
-      if dpkg -s "$pkg" &>/dev/null; then
+      if command -v "$pkg" &>/dev/null; then
         echo "✅ $pkg already installed"
       else
         echo "📦 Installing $pkg..."
@@ -147,6 +146,12 @@ install_snazzy_theme() {
     fi
 }
 
+# Install packages, zshplugins, and fzf
+install_packages
+install_zsh_plugins
+install_fzf
+install_snazzy_theme
+
 # Symlink dotfiles
 for filename in "${FILES_TO_LINK[@]}"; do
   target="$HOME/$filename"
@@ -161,7 +166,7 @@ for filename in "${FILES_TO_LINK[@]}"; do
     backup_file "$target"
   fi
 
-  ln -s "$source" "$target"
+  ln -sf "$source" "$target"
   echo "🔗 Linked $target → $source"
 done
 
@@ -173,12 +178,6 @@ if [ ! -d "$ZSH_CACHE_DIR" ]; then
 else
   echo "✅ Zsh completion cache directory already exists"
 fi
-
-# Install packages, plugins, and fzf
-install_packages
-install_zsh_plugins
-install_fzf
-install_snazzy_theme
 
 # Ensure ~/.gitconfig.local exists with user identity
 if [[ ! -f "$HOME/.gitconfig.local" ]]; then
@@ -197,6 +196,10 @@ fi
 
 # Change shell to Zsh
 ZSH_PATH="$(command -v zsh)"
+if ! grep -q "$ZSH_PATH" /etc/shells; then
+    echo "⚠️  $ZSH_PATH is not in /etc/shells. You may need to add it manually, otherwise chsh will fail silently."
+fi
+
 if [ "$SHELL" != "$ZSH_PATH" ]; then
   echo "🌀 Changing default shell to Zsh ($ZSH_PATH)..."
   chsh -s "$ZSH_PATH"
