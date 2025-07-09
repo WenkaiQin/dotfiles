@@ -88,6 +88,11 @@ setopt EXTENDED_HISTORY
 setopt HIST_REDUCE_BLANKS
 setopt SHARE_HISTORY
 
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd history -a      # Append current session's history to the history file.
+add-zsh-hook precmd history -c      # Clear current session's memory.
+add-zsh-hook precmd history -r      # Re-read from disk.
+
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
 
@@ -96,11 +101,11 @@ autoload -Uz select-word-style
 select-word-style bash
 
 # Ctrl + Arrow
-bindkey "^[[1;5D" backward-word  # Ctrl+Left
-bindkey "^[[1;5C" forward-word   # Ctrl+Right
+bindkey "^[[1;5D" backward-word     # Ctrl+Left
+bindkey "^[[1;5C" forward-word      # Ctrl+Right
 
 # Alt + Arrow
-bindkey "^[^[[D" backward-word   # Alt+Left
-bindkey "^[^[[C" forward-word    # Alt+Right
-bindkey "^[[1;3D" backward-word   # Alt+Left
-bindkey "^[[1;3C" forward-word    # Alt+Right
+bindkey "^[^[[D" backward-word      # Alt+Left
+bindkey "^[^[[C" forward-word       # Alt+Right
+bindkey "^[[1;3D" backward-word     # Alt+Left
+bindkey "^[[1;3C" forward-word      # Alt+Right
