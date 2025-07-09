@@ -130,19 +130,11 @@ install_zsh_plugins() {
   fi
 }
 
-# Install Snazzy theme
+
+# Install Snazzy theme (unified script)
 install_snazzy_theme() {
     echo "🎨 Installing Snazzy terminal theme..."
-
-    if [ "$platform" = "mac" ]; then
-        echo "🧠 macOS detected — using Terminal.app installer"
-        bash "$DOTFILES_DIR/install_snazzy_mac.sh"
-    elif [ "$platform" = "linux" ]; then
-        echo "🧠 Linux detected — using GNOME Terminal installer"
-        bash "$DOTFILES_DIR/install_snazzy_gnome.sh"
-    else
-        echo "⚠️ Unsupported platform for Snazzy installation."
-    fi
+    bash "$DOTFILES_DIR/install_snazzy.sh"
 }
 
 # Uninstall option.
@@ -154,7 +146,7 @@ if [[ "$1" == "uninstall" ]]; then
         if [ -L "$target" ] && [[ "$(readlink "$target")" == "$DOTFILES_DIR/"* ]]; then
             echo "❌ Removing symlink: $target"
             rm "$target"
-            if ls "$tar¸get".bak.* &>/dev/null; then
+            if ls "$target".bak.* &>/dev/null; then
                 latest_backup=$(ls "$target".bak.* | sort | tail -n 1)
                 echo "🔁 Restoring backup: $latest_backup → $target"
                 mv "$latest_backup" "$target"
@@ -185,8 +177,8 @@ fi
 # Install packages, zshplugins, and fzf
 install_packages
 install_zsh_plugins
-install_fzf
 install_snazzy_theme
+install_fzf
 
 # Symlink dotfiles
 for filename in "${FILES_TO_LINK[@]}"; do

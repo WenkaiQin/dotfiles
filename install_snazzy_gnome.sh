@@ -2,6 +2,12 @@
 
 set -e
 
+FORCE=false
+if [[ "$1" == "--force" ]]; then
+    FORCE=true
+    echo "🔁 Force mode enabled — reinstalling Snazzy theme."
+fi
+
 # Check for existing Snazzy profile first
 echo "🔍 Checking for existing Snazzy GNOME Terminal profile..."
 EXISTING_UUID=""
@@ -15,10 +21,18 @@ for PROFILE_ID in $PROFILE_LIST; do
     fi
 done
 
-if [[ -n "$EXISTING_UUID" ]]; then
+if [[ -n "$EXISTING_UUID" && "$FORCE" == false ]]; then
     echo "✅ Snazzy profile already exists (UUID: $EXISTING_UUID). Skipping installation."
+    echo "ℹ️  Use './install_snazzy_gnome.sh --force' to reinstall."
     gsettings set org.gnome.Terminal.ProfilesList default "$EXISTING_UUID"
     exit 0
+fi
+
+if [[ -n "$EXISTING_UUID" && "$FORCE" == true ]]; then
+    echo "🔁 Reinstalling Snazzy theme after forced removal..."
+    echo "🗑️  Removing existing Snazzy profile (UUID: $EXISTING_UUID)..."
+    dconf reset -f "/org/gnome/terminal/legacy/profiles:/:$EXISTING_UUID/"
+    gsettings set org.gnome.Terminal.ProfilesList list "[$(gsettings get org.gnome.Terminal.ProfilesList list | tr -d "[]'" | sed "s/\b$EXISTING_UUID\b//g" | xargs | sed 's/ /, /g')]"
 fi
 
 # Update package lists and install required dependencies
@@ -42,7 +56,6 @@ PROFILE_LIST=$(gsettings get org.gnome.Terminal.ProfilesList list | tr -d "[],'"
 
 for PROFILE_ID in $PROFILE_LIST; do
     NAME=$(gsettings get "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE_ID/" visible-name)
-    echo $NAME
     if [[ $NAME == *"Snazzy"* ]]; then
         SNAZZY_UUID=$PROFILE_ID
         break

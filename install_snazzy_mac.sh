@@ -3,7 +3,8 @@
 set -e
 
 echo "🔧 Checking OS..."
-if [[ "$OSTYPE" != "darwin"* ]]; then
+echo "OSTYPE is: '$OSTYPE'"
+if [[ "$(uname)" != "Darwin" ]]; then
     echo "❌ This script is for macOS Terminal.app only."
     exit 1
 fi
@@ -12,8 +13,13 @@ fi
 THEME_NAME="Snazzy"
 PLIST="$HOME/Library/Preferences/com.apple.Terminal.plist"
 
-/usr/libexec/PlistBuddy -c "Print 'Window Settings':$THEME_NAME" "$PLIST" &>/dev/null
-if [[ $? -eq 0 ]]; then
+FORCE=false
+if [[ "$1" == "--force" ]]; then
+    FORCE=true
+    echo "🔁 Force mode enabled — will reinstall Snazzy theme."
+fi
+
+if /usr/libexec/PlistBuddy -c "Print 'Window Settings':$THEME_NAME" "$PLIST" &>/dev/null && [[ "$FORCE" == false ]]; then
     echo "✅ Terminal profile '$THEME_NAME' already exists. Skipping installation."
     exit 0
 fi
@@ -37,6 +43,9 @@ sleep 2
 
 echo "📌 Setting Snazzy as the default Terminal profile..."
 osascript <<EOF
+if application "Terminal" is not running then
+    tell application "Terminal" to activate
+end if
 tell application "Terminal"
     set default settings to settings set "$THEME_NAME"
     set startup settings to settings set "$THEME_NAME"
