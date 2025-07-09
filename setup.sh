@@ -18,7 +18,6 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 FILES_TO_LINK=(
   ".zshrc"
-  # "agkozak-zsh-prompt.plugin.zsh" # No longer used, replaced by pure
   ".gitignore_global"
   ".gitconfig"
 )
@@ -145,6 +144,43 @@ install_snazzy_theme() {
         echo "⚠️ Unsupported platform for Snazzy installation."
     fi
 }
+
+# Uninstall option.
+if [[ "$1" == "uninstall" ]]; then
+    echo "⚠️  Starting dotfiles uninstall..."
+
+    for filename in "${FILES_TO_LINK[@]}"; do
+        target="$HOME/$filename"
+        if [ -L "$target" ] && [[ "$(readlink "$target")" == "$DOTFILES_DIR/"* ]]; then
+            echo "❌ Removing symlink: $target"
+            rm "$target"
+            if ls "$tar¸get".bak.* &>/dev/null; then
+                latest_backup=$(ls "$target".bak.* | sort | tail -n 1)
+                echo "🔁 Restoring backup: $latest_backup → $target"
+                mv "$latest_backup" "$target"
+            fi
+        fi
+    done
+
+    echo "🧹 Removing Zsh plugins..."
+    rm -rf ~/.zsh/zsh-syntax-highlighting ~/.zsh/zsh-autosuggestions ~/.zsh/pure
+
+    echo "🧹 Removing fzf..."
+    if [[ "$platform" == "linux" ]]; then
+        rm -rf ~/.fzf
+        echo "⚠️  GNOME Terminal theme was not automatically reverted."
+        echo "📝 To remove Snazzy: open GNOME Terminal → Preferences → Profiles and switch to a different theme or delete the Snazzy profile manually."
+    elif [[ "$platform" == "mac" ]]; then
+        brew uninstall fzf &>/dev/null || true
+        brew uninstall pure &>/dev/null || true
+        echo "⚠️  Terminal theme was not automatically reverted."
+        echo "📝 To remove Snazzy: open Terminal → Settings → Profiles and switch or delete manually."
+    fi
+
+
+    echo "❌ Dotfiles uninstallation complete."
+    exit 0
+fi
 
 # Install packages, zshplugins, and fzf
 install_packages
