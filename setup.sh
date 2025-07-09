@@ -215,8 +215,8 @@ if [[ ! -f "$HOME/.gitconfig.local" ]]; then
 
   cat > "$HOME/.gitconfig.local" <<EOF
 [user]
-    name = $git_name
-    email = $git_email
+	name = $git_name
+	email = $git_email
 EOF
 
   echo "✅ ~/.gitconfig.local created."

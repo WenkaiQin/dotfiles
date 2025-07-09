@@ -1,12 +1,15 @@
 [merge]
-    tool = bc
+	tool = bc
 [core]
 	excludesfile = ~/.gitignore_global
-    editor = vim
-    autocrlf = input
+	editor = vim
+	autocrlf = input
+	whitespace = trailing-space
 [color]
-    ui = auto
+	ui = auto
 [pull]
-    ff = only
+	ff = only
 [include]
-    path = ~/.gitconfig.local
+	path = ~/.gitconfig.local
+[diff]
+	ignoreWhitespace = true
