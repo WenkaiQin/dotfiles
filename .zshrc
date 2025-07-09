@@ -1,12 +1,18 @@
-# Autocomplete tweaking.
-# Brew autocomplete.
-if command -v brew &>/dev/null; then
-    fpath+=("$(brew --prefix)/share/zsh/site-functions")
-fi
+# Setup Zsh completion cache.
+ZSH_CACHE_DIR="$HOME/.zsh/cache"
+mkdir -p "$ZSH_CACHE_DIR"
 
-# Enable completion cache.
 zstyle ':completion::complete:*' use-cache on
-zstyle ':completion::complete:*' cache-path ~/.zsh/cache
+zstyle ':completion::complete:*' cache-path "$ZSH_CACHE_DIR"
+
+# Load compinit with cache support.
+autoload -Uz compinit
+zcompdump="${ZSH_CACHE_DIR}/zcompdump"
+if [[ -s "$zcompdump" ]]; then
+    compinit -d "$zcompdump"
+else
+    compinit -C -d "$zcompdump"
+fi
 
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
@@ -63,9 +69,6 @@ if command -v brew &>/dev/null; then
   fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fi
 
-autoload -U promptinit; promptinit
-prompt pure
-
 autoload -U promptinit; promptinit;
 zstyle :prompt:pure:git:stash show yes
 prompt pure
@@ -102,3 +105,10 @@ bindkey "^[^[[D" backward-word      # Alt+Left
 bindkey "^[^[[C" forward-word       # Alt+Right
 bindkey "^[[1;3D" backward-word     # Alt+Left
 bindkey "^[[1;3C" forward-word      # Alt+Right
+
+# Sync history across sessions safely
+autoload -Uz add-zsh-hook
+sync-history() {
+    builtin fc -AI
+}
+add-zsh-hook precmd sync-history
