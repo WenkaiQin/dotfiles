@@ -89,9 +89,12 @@ setopt HIST_REDUCE_BLANKS
 setopt SHARE_HISTORY
 
 autoload -Uz add-zsh-hook
-add-zsh-hook precmd history -a      # Append current session's history to the history file.
-add-zsh-hook precmd history -c      # Clear current session's memory.
-add-zsh-hook precmd history -r      # Re-read from disk.
+sync_history() {
+    builtin history -a       # Append this session's history to the history file.
+    builtin history -c       # Clear in-memory history.
+    builtin history -r       # Re-read history from the file.
+}
+add-zsh-hook precmd sync_history
 
 # Misellaneous paths.
 export SL_AWS=s3://ssa-external-upload-mini-gnss-production
