@@ -229,8 +229,13 @@ if ! grep -q "$ZSH_PATH" /etc/shells; then
 fi
 
 if [ "$SHELL" != "$ZSH_PATH" ]; then
-  echo "🌀 Changing default shell to Zsh ($ZSH_PATH)..."
-  chsh -s "$ZSH_PATH"
+  LOGIN_USER="$(whoami)"
+  if ! grep -q "^$LOGIN_USER:" /etc/passwd; then
+    echo "⚠️  Skipping chsh: user '$LOGIN_USER' not found in /etc/passwd. You may need to change shell manually."
+  else
+    echo "🌀 Changing default shell to Zsh ($ZSH_PATH) for user $LOGIN_USER..."
+    chsh -s "$ZSH_PATH" "$LOGIN_USER"
+  fi
 fi
 
 echo "✅ Dotfiles setup complete."
