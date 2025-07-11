@@ -21,13 +21,19 @@ setopt noautomenu
 setopt nomenucomplete
 
 # Enable fzf key bindings and completions if available
-if [[ -f ~/.fzf.zsh ]]; then
-    source ~/.fzf.zsh
-elif ! command -v fzf &>/dev/null; then
+if ! command -v fzf &>/dev/null; then
     echo "⚠️  fzf not found. Install it to enable fuzzy finding features."
 else
-    echo "⚠️  fzf installed but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
-fi
+    fzf_version=$(fzf --version | awk '{print $1}')
+    min_version="0.48"
+    if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
+        echo "⚠️  fzf version $fzf_version is less than $min_version — key bindings and completions may not be available."
+    elif ! [[ -f ~/.fzf.zsh ]]; then
+        echo "⚠️  fzf installed but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
+    else
+        source ~/.fzf.zsh
+    fi
+fi   
 
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
