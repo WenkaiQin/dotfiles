@@ -13,26 +13,24 @@ if [[ -s "$zcompdump" ]]; then
 else
     compinit -C -d "$zcompdump"
 fi
-
-autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
 
 setopt noautomenu
 setopt nomenucomplete
 
 # Enable fzf key bindings and completions if available
-if ! command -v fzf &>/dev/null; then
-    echo "⚠️  fzf not found. Install it to enable fuzzy finding features."
-else
+if command -v fzf &>/dev/null; then
     fzf_version=$(fzf --version | awk '{print $1}')
     min_version="0.48"
     if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
         echo "⚠️  fzf version $fzf_version is less than $min_version — key bindings and completions may not be available."
-    elif ! [[ -f ~/.fzf.zsh ]]; then
+    elif ! [[ -r ~/.fzf.zsh ]]; then
         echo "⚠️  fzf installed but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
     else
         source ~/.fzf.zsh
     fi
+else
+    echo "⚠️  fzf not found. Install it to enable fuzzy finding features."
 fi   
 
 # Additional arguments for common commands.
@@ -75,7 +73,7 @@ if command -v brew &>/dev/null; then
   fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fi
 
-autoload -U promptinit; promptinit;
+autoload -Uz promptinit; promptinit;
 zstyle :prompt:pure:git:stash show yes
 prompt pure
 
