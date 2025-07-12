@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 echo "🛠️  Starting dotfiles setup..."
@@ -76,7 +75,6 @@ install_fzf() {
       brew install fzf
     fi
 
-    # macOS: run the install script for keybindings and completion
     FZF_INSTALL_SCRIPT="$(brew --prefix)/opt/fzf/install"
     if [[ -x "$FZF_INSTALL_SCRIPT" ]]; then
       echo "⚙️  Setting up fzf key bindings and completions..."
@@ -143,7 +141,7 @@ if [[ "$1" == "uninstall" ]]; then
 
     for filename in "${FILES_TO_LINK[@]}"; do
         target="$HOME/$filename"
-        if [ -L "$target" ] && [[ "$(readlink "$target")" == "$DOTFILES_DIR/"* ]]; then
+        if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$DOTFILES_DIR/"* ]]; then
             echo "❌ Removing symlink: $target"
             rm "$target"
             if ls "$target".bak.* &>/dev/null; then

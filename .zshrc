@@ -19,19 +19,21 @@ setopt noautomenu
 setopt nomenucomplete
 
 # Enable fzf key bindings and completions if available
-if command -v fzf &>/dev/null; then
-    fzf_version=$(fzf --version | awk '{print $1}')
+if [[ "$OSTYPE" == "linux"* ]] && [[ -x "$HOME/.fzf/bin/fzf" ]]; then
+    export PATH="$HOME/.fzf/bin:$PATH"
+    fzf_version=$("$HOME/.fzf/bin/fzf" --version | awk '{print $1}')
     min_version="0.48"
+    fzf_source_file="$HOME/.fzf.zsh"
     if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
         echo "⚠️  fzf version $fzf_version is less than $min_version — key bindings and completions may not be available."
-    elif ! [[ -r ~/.fzf.zsh ]]; then
-        echo "⚠️  fzf installed but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
+    elif [[ ! -r "$fzf_source_file" ]]; then
+        echo "⚠️  fzf found in ~/.fzf but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
     else
-        source ~/.fzf.zsh
+        source "$fzf_source_file"
     fi
 else
     echo "⚠️  fzf not found. Install it to enable fuzzy finding features."
-fi   
+fi
 
 # Additional arguments for common commands.
 alias grep='grep --color=auto'
@@ -55,6 +57,7 @@ elif [[ -x "/opt/sublime_text/sublime_text" ]]; then
     # Linux default install path
     alias subl="/opt/sublime_text/sublime_text"
 fi
+
 # Pangea stuff.
 export BIBINPUTS=~/Workspace/pangea/:
 export BSTINPUTS=~/Workspace/pangea/texStyleFiles:
