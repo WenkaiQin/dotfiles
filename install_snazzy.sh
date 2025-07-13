@@ -2,10 +2,10 @@
 
 set -e
 
-# Abort if no DISPLAY or running in SSH session
-if [[ -z "$DISPLAY" || "$(ps -h -o comm -p $PPID)" == "sshd" ]]; then
-    echo "❌ This script must be run in a graphical terminal (like GNOME Terminal), not via SSH or headless session."
-    echo "💡 Try running from the GNOME Terminal inside your desktop session."
+# Abort if not in a valid GNOME session (local or VNC)
+if [[ -z "$DISPLAY" ]] || ! gsettings list-schemas &>/dev/null || [[ "$XDG_CURRENT_DESKTOP" != *GNOME* && "$XDG_SESSION_DESKTOP" != *gnome* ]]; then
+    echo "❌ Snazzy theme install requires an active GNOME session with access to gsettings."
+    echo "💡 Make sure you're running this from GNOME Terminal or a VNC/X11 session on the desktop, not SSH."
     exit 1
 fi
 
