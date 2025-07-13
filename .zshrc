@@ -22,18 +22,23 @@ setopt nomenucomplete
 
 # Enable fzf key bindings and completions if available.
 fzf_source_file="$HOME/.fzf.zsh"
+
+# Source the fzf bin. Linux requires special treatment since we install it using git.
+if [[ "$OSTYPE" == "linux"* ]]; then
+    export PATH="$HOME/.fzf/bin:$PATH"
+fi
+
 if command -v fzf &>/dev/null; then
-    if [[ "$OSTYPE" == "linux"* ]]; then
-        # Ensure we're first considering the git-installed fzf first, as long as it
-        # exists. Even if we don't have it, fallback to the sudo apt version and
-        # hope it's the right version.
-        export PATH="$HOME/.fzf/bin:$PATH"
-        fzf_version=$(fzf --version | awk '{print $1}')
-        min_version="0.48"
-        if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
-            echo "⚠️  fzf version $fzf_version is less than $min_version - key bindings and completions may not be available."
-        fi
+
+    # Detect fzf version -- too low, need above 0.48 for keybindings and
+    # completions.
+    fzf_version=$(fzf --version | awk '{print $1}')
+    min_version="0.48"
+    if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
+        echo "⚠️  fzf version $fzf_version is less than $min_version - key bindings and completions may not be available."
     fi
+
+    # Detect no fzf source file found.
     if [[ ! -r "$fzf_source_file" ]]; then
         fzf_bin_path="$(command -v fzf)"
         fzf_base_dir="${fzf_bin_path:h:h}"

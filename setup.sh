@@ -107,7 +107,7 @@ install_fzf() {
     echo "  Terminal → Preferences → Profile → Keyboard → Check 'Use Option as Meta Key'"
     read -n 1 -r -s -p $'Press any key once done...\n'
 
-  elif [[ "$platform" == "linux" ]]; then
+  elif [[ "$platform" == "linux" || "$platform" == "redhat" ]]; then
     if [ -d "$HOME/.fzf" ]; then
       echo "🔁 Updating existing ~/.fzf..."
       (cd "$HOME/.fzf" && git pull)
@@ -151,7 +151,9 @@ install_zsh_plugins() {
 # Install Snazzy theme (unified script)
 install_snazzy_theme() {
     echo "🎨 Installing Snazzy terminal theme..."
-    bash "$DOTFILES_DIR/install_snazzy.sh"
+    if ! bash "$DOTFILES_DIR/install_snazzy.sh"; then
+        echo "⚠️  Warning: Snazzy theme installation failed or was skipped. You can try again by running install_snazzy."
+    fi
 }
 
 # Uninstall option.
@@ -185,7 +187,6 @@ if [[ "$1" == "uninstall" ]]; then
         echo "⚠️  Terminal theme was not automatically reverted."
         echo "📝 To remove Snazzy: open Terminal → Settings → Profiles and switch or delete manually."
     fi
-
 
     echo "❌ Dotfiles uninstallation complete."
     exit 0
