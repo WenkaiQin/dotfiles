@@ -36,13 +36,13 @@ install_packages() {
 
   if [[ "$platform" == "linux" ]]; then
     REQUIRED_PKGS=(zsh git curl)
-    sudo apt update
+    sudo apt-get update -y
     for pkg in "${REQUIRED_PKGS[@]}"; do
       if command -v "$pkg" &>/dev/null; then
         echo "✅ $pkg already installed"
       else
         echo "📦 Installing $pkg..."
-        sudo apt install -y "$pkg"
+        sudo apt-get install -y "$pkg"
       fi
     done
 
