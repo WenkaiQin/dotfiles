@@ -2,6 +2,13 @@
 
 set -e
 
+# Abort if no DISPLAY or running in SSH session
+if [[ -z "$DISPLAY" || "$(ps -h -o comm -p $PPID)" == "sshd" ]]; then
+    echo "❌ This script must be run in a graphical terminal (like GNOME Terminal), not via SSH or headless session."
+    echo "💡 Try running from the GNOME Terminal inside your desktop session."
+    exit 1
+fi
+
 FORCE=false
 if [[ "$1" == "--force" ]]; then
     FORCE=true
