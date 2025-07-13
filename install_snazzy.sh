@@ -66,8 +66,17 @@ Linux)
     echo "🧠 Linux detected — configuring GNOME Terminal..."
 
     echo "🔧 Installing dependencies..."
-    sudo apt update
-    sudo apt install -y dconf-cli uuid-runtime wget curl
+    if command -v apt &>/dev/null; then
+        sudo apt update
+        sudo apt install -y dconf-cli uuid-runtime wget curl
+    elif command -v dnf &>/dev/null; then
+        sudo dnf install -y dconf uuid wget curl
+    elif command -v yum &>/dev/null; then
+        sudo yum install -y dconf uuid wget curl
+    else
+        echo "❌ Unsupported package manager. Install dconf, uuid, wget, and curl manually."
+        exit 1
+    fi
 
     EXISTING_UUID=""
     PROFILE_LIST=$(gsettings get org.gnome.Terminal.ProfilesList list | tr -d "[],'")

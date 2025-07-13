@@ -37,8 +37,17 @@ fi
 
 # Update package lists and install required dependencies
 echo "🔧 Installing dependencies..."
-sudo apt update
-sudo apt install -y dconf-cli uuid-runtime wget curl
+if command -v apt &>/dev/null; then
+    sudo apt update
+    sudo apt install -y dconf-cli uuid-runtime wget curl
+elif command -v dnf &>/dev/null; then
+    sudo dnf install -y dconf uuid wget curl
+elif command -v yum &>/dev/null; then
+    sudo yum install -y dconf uuid wget curl
+else
+    echo "❌ Unsupported package manager. Please install: dconf, uuid-runtime, wget, and curl manually."
+    exit 1
+fi
 
 # Download and run the Gogh installer script, selecting the 'Snazzy' theme
 echo "🎨 Installing Snazzy theme for GNOME Terminal using Gogh..."

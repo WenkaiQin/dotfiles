@@ -148,7 +148,6 @@ install_zsh_plugins() {
   fi
 }
 
-
 # Install Snazzy theme (unified script)
 install_snazzy_theme() {
     echo "🎨 Installing Snazzy terminal theme..."
