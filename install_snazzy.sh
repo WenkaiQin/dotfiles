@@ -2,13 +2,6 @@
 
 set -e
 
-# Abort if not in a valid GNOME session (local or VNC)
-if [[ -z "$DISPLAY" ]] || ! gsettings list-schemas &>/dev/null || [[ "$XDG_CURRENT_DESKTOP" != *GNOME* && "$XDG_SESSION_DESKTOP" != *gnome* ]]; then
-    echo "❌ Snazzy theme install requires an active GNOME session with access to gsettings."
-    echo "💡 Make sure you're running this from GNOME Terminal or a VNC/X11 session on the desktop, not SSH."
-    exit 0
-fi
-
 FORCE=false
 if [[ "$1" == "--force" ]]; then
     FORCE=true
@@ -70,6 +63,12 @@ EOF
 
 Linux)
     echo "🧠 Linux detected — configuring GNOME Terminal..."
+
+    if [[ -z "$DISPLAY" ]] || ! gsettings list-schemas &>/dev/null || [[ "$XDG_CURRENT_DESKTOP" != *GNOME* && "$XDG_SESSION_DESKTOP" != *gnome* ]]; then
+        echo "❌ Snazzy theme install requires an active GNOME session with access to gsettings."
+        echo "💡 Make sure you're running this from GNOME Terminal or a VNC/X11 session on the desktop, not SSH."
+        exit 0
+    fi
 
     echo "🔧 Installing dependencies..."
     if command -v apt &>/dev/null; then
