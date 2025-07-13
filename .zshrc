@@ -1,11 +1,13 @@
-# Setup Zsh completion cache.
+# De-duplicate fpath. Just in case!
+typeset -U fpath 
+
+# Setup Zsh completion cache. Then, load compinit with cache support.
 ZSH_CACHE_DIR="$HOME/.zsh/cache"
 mkdir -p "$ZSH_CACHE_DIR"
 
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path "$ZSH_CACHE_DIR"
 
-# Load compinit with cache support.
 autoload -Uz compinit
 zcompdump="${ZSH_CACHE_DIR}/zcompdump"
 if [[ -s "$zcompdump" ]]; then
@@ -18,21 +20,32 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
 setopt noautomenu
 setopt nomenucomplete
 
-# Enable fzf key bindings and completions if available
-if [[ "$OSTYPE" == "linux"* ]] && [[ -x "$HOME/.fzf/bin/fzf" ]]; then
-    export PATH="$HOME/.fzf/bin:$PATH"
-    fzf_version=$("$HOME/.fzf/bin/fzf" --version | awk '{print $1}')
-    min_version="0.48"
-    fzf_source_file="$HOME/.fzf.zsh"
-    if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
-        echo "⚠️  fzf version $fzf_version is less than $min_version — key bindings and completions may not be available."
-    elif [[ ! -r "$fzf_source_file" ]]; then
-        echo "⚠️  fzf found in ~/.fzf but ~/.fzf.zsh is missing. Run ~/.fzf/install to generate key bindings and completions."
+# Source brew if it's not already sourced.
+if ! command -v brew &>/dev/null; then
+  fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fi
+
+# Enable fzf key bindings and completions if available.
+fzf_source_file="$HOME/.fzf.zsh"
+if command -v fzf &>/dev/null; then
+    if [[ "$OSTYPE" == "linux"* ]]; then
+        # Ensure we're first considering the git-installed fzf first, as long as it
+        # exists. Even if we don't have it, fallback to the sudo apt version and
+        # hope it's the right version.
+        export PATH="$HOME/.fzf/bin:$PATH"
+        fzf_version=$(fzf --version | awk '{print $1}')
+        min_version="0.48"
+        if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
+            echo "⚠️  fzf version $fzf_version is less than $min_version - key bindings and completions may not be available."
+        fi
+    fi
+    if [[ ! -r "$fzf_source_file" ]]; then
+        fzf_bin_path="$(command -v fzf)"
+        fzf_base_dir="${fzf_bin_path:h:h}"
+        echo "⚠️  fzf is installed at $fzf_bin_path but completions are missing. Run \"$fzf_base_dir/install\" to generate key bindings and completions."
     else
         source "$fzf_source_file"
     fi
-else
-    echo "⚠️  fzf not found. Install it to enable fuzzy finding features."
 fi
 
 # Additional arguments for common commands.
@@ -63,17 +76,9 @@ export BIBINPUTS=~/Workspace/pangea/:
 export BSTINPUTS=~/Workspace/pangea/texStyleFiles:
 export TEXINPUTS=~/Workspace/pangea/texStyleFiles:
 
-# Add Pure prompt path depending on platform.
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS (Homebrew install path)
-    fpath+=("/opt/homebrew/share/zsh/site-functions")
-elif [[ -d "$HOME/.zsh/pure" ]]; then
-    # Linux manual install path
+# Add Pure prompt path if on Linux. On Mac, Homebrew covers it.
+if [[ "$OSTYPE" == "linux"* ]] && [[ -d "$HOME/.zsh/pure" ]]; then
     fpath+=("$HOME/.zsh/pure")
-fi
-
-if command -v brew &>/dev/null; then
-  fpath+=("$(brew --prefix)/share/zsh/site-functions")
 fi
 
 autoload -Uz promptinit; promptinit;
