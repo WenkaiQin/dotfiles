@@ -5,12 +5,15 @@ echo "🛠️  Starting dotfiles setup..."
 
 # Determine OS type
 OS_TYPE="$(uname -s)"
-case "$OS_TYPE" in
-    Linux*)     platform=linux;;
-    Darwin*)    platform=mac;;
-    *)          echo "Unsupported platform: $OS_TYPE"; exit 1;;
-esac
-echo "Detected platform: $platform"
+if [ -f /etc/redhat-release ]; then
+    platform=redhat
+else
+    case "$OS_TYPE" in
+        Linux*)     platform=linux;;
+        Darwin*)    platform=mac;;
+        *)          echo "Unsupported platform: $OS_TYPE"; exit 1;;
+    esac
+fi
 
 # Set up dotfiles directory
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -36,13 +39,30 @@ install_packages() {
 
   if [[ "$platform" == "linux" ]]; then
     REQUIRED_PKGS=(zsh git curl)
-    sudo apt-get update -y
+    sudo apt update
     for pkg in "${REQUIRED_PKGS[@]}"; do
       if command -v "$pkg" &>/dev/null; then
         echo "✅ $pkg already installed"
       else
         echo "📦 Installing $pkg..."
-        sudo apt-get install -y "$pkg"
+        sudo apt install -y "$pkg"
+      fi
+    done
+
+  elif [[ "$platform" == "redhat" ]]; then
+    REQUIRED_PKGS=(zsh git curl)
+    if command -v dnf &>/dev/null; then
+      PKG_MGR=dnf
+    else
+      PKG_MGR=yum
+    fi
+    sudo $PKG_MGR -y makecache
+    for pkg in "${REQUIRED_PKGS[@]}"; do
+      if command -v "$pkg" &>/dev/null; then
+        echo "✅ $pkg already installed"
+      else
+        echo "📦 Installing $pkg..."
+        sudo $PKG_MGR install -y "$pkg"
       fi
     done
 
