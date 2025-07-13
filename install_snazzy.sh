@@ -25,7 +25,6 @@ Darwin)
     THEME_URL="https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/terminal/Snazzy.terminal"
     TMP_DIR=$(mktemp -d)
     THEME_PATH="$TMP_DIR/Snazzy.terminal"
-
     echo "🎨 Downloading Snazzy theme for Terminal.app..."
     curl -fsSL -o "$THEME_PATH" "$THEME_URL"
 

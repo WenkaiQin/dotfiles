@@ -20,11 +20,6 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
 setopt noautomenu
 setopt nomenucomplete
 
-# Source brew if it's not already sourced.
-if ! command -v brew &>/dev/null; then
-  fpath+=("$(brew --prefix)/share/zsh/site-functions")
-fi
-
 # Enable fzf key bindings and completions if available.
 fzf_source_file="$HOME/.fzf.zsh"
 if command -v fzf &>/dev/null; then
