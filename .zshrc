@@ -8,17 +8,22 @@ mkdir -p "$ZSH_CACHE_DIR"
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion::complete:*' cache-path "$ZSH_CACHE_DIR"
 
+# Enhanced UI
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}%d%f'
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
+# zstyle ':completion:*' menu yes select
+
+setopt noautomenu
 autoload -Uz compinit
+
 zcompdump="${ZSH_CACHE_DIR}/zcompdump"
 if [[ -s "$zcompdump" ]]; then
     compinit -d "$zcompdump"
 else
     compinit -C -d "$zcompdump"
 fi
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' 'r:|[._-]=* r:|=*'
-
-setopt noautomenu
-setopt nomenucomplete
 
 # Enable fzf key bindings and completions if available.
 fzf_source_file="$HOME/.fzf.zsh"
@@ -118,6 +123,8 @@ bindkey "^[^[[D" backward-word      # Alt+Left
 bindkey "^[^[[C" forward-word       # Alt+Right
 bindkey "^[[1;3D" backward-word     # Alt+Left
 bindkey "^[[1;3C" forward-word      # Alt+Right
+
+bindkey -e
 
 # Sync history across sessions safely
 autoload -Uz add-zsh-hook
