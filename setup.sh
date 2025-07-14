@@ -112,61 +112,45 @@ install_fzf() {
   fi
 }
 
-# Install zsh plugins
-# Install zsh plugins
+# Install Zsh plugins
 install_zsh_plugins() {
-  mkdir -p ~/.zsh
-
   echo "🔌 Installing Zsh plugins..."
 
+  mkdir -p ~/.zsh
+
+  # Define plugins and install methods
   if [[ "$platform" == "mac" ]]; then
-    # Install zsh-syntax-highlighting via Homebrew
-    if brew list zsh-syntax-highlighting &>/dev/null; then
-      echo "✅ zsh-syntax-highlighting already installed via Homebrew"
-    else
-      echo "✨ Installing zsh-syntax-highlighting via Homebrew..."
-      brew install zsh-syntax-highlighting
-    fi
+    declare -A HOMEBREW_PLUGINS=(
+      [zsh-syntax-highlighting]="✨"
+      [zsh-autosuggestions]="💡"
+      [pure]="🌟"
+    )
 
-    # Install zsh-autosuggestions via Homebrew
-    if brew list zsh-autosuggestions &>/dev/null; then
-      echo "✅ zsh-autosuggestions already installed via Homebrew"
-    else
-      echo "💡 Installing zsh-autosuggestions via Homebrew..."
-      brew install zsh-autosuggestions
-    fi
-
-    # Install pure via Homebrew
-    if brew list pure &>/dev/null; then
-      echo "✅ pure prompt already installed via Homebrew"
-    else
-      echo "🌟 Installing pure prompt via Homebrew..."
-      brew install pure
-    fi
+    for plugin in "${!HOMEBREW_PLUGINS[@]}"; do
+      if brew list "$plugin" &>/dev/null; then
+        echo "✅ $plugin already installed via Homebrew"
+      else
+        echo "${HOMEBREW_PLUGINS[$plugin]} Installing $plugin via Homebrew..."
+        brew install "$plugin"
+      fi
+    done
 
   else
-    # Install manually on Linux/RedHat
+    declare -A GIT_PLUGINS=(
+      [zsh-syntax-highlighting]="https://github.com/zsh-users/zsh-syntax-highlighting.git"
+      [zsh-autosuggestions]="https://github.com/zsh-users/zsh-autosuggestions.git"
+      [pure]="https://github.com/sindresorhus/pure.git"
+    )
 
-    if [ ! -d "${HOME}/.zsh/zsh-syntax-highlighting" ]; then
-      echo "✨ Installing zsh-syntax-highlighting..."
-      git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${HOME}/.zsh/zsh-syntax-highlighting"
-    else
-      echo "✅ zsh-syntax-highlighting already installed"
-    fi
-
-    if [ ! -d "${HOME}/.zsh/zsh-autosuggestions" ]; then
-      echo "💡 Installing zsh-autosuggestions..."
-      git clone https://github.com/zsh-users/zsh-autosuggestions "${HOME}/.zsh/zsh-autosuggestions"
-    else
-      echo "✅ zsh-autosuggestions already installed"
-    fi
-
-    if [ ! -d "${HOME}/.zsh/pure" ]; then
-      echo "🌟 Installing pure prompt manually..."
-      git clone https://github.com/sindresorhus/pure.git "${HOME}/.zsh/pure"
-    else
-      echo "✅ pure prompt already installed"
-    fi
+    for plugin in "${!GIT_PLUGINS[@]}"; do
+      local target="${HOME}/.zsh/$plugin"
+      if [[ -d "$target" ]]; then
+        echo "✅ $plugin already installed"
+      else
+        echo "⬇️  Installing $plugin..."
+        git clone "${GIT_PLUGINS[$plugin]}" "$target"
+      fi
+    done
   fi
 }
 
