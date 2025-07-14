@@ -103,9 +103,15 @@ install_fzf() {
       echo "⚠️  fzf install script not found at $FZF_INSTALL_SCRIPT"
     fi
 
-    echo "⚠️  IMPORTANT: Enable 'Use Option as Meta' in Terminal.app:"
-    echo "  Terminal → Preferences → Profile → Keyboard → Check 'Use Option as Meta Key'"
-    read -n 1 -r -s -p $'Press any key once done...\n'
+    echo ""
+    echo "💡 Terminal.app tips:"
+    echo "   • Enable 'Use Option as Meta':"
+    echo "     Terminal → Preferences → Profile → Keyboard → ✅ Use Option as Meta Key"
+    echo "   • Customize window title:"
+    echo "     Terminal → Preferences → Profile → Window → Title: Working Directory"
+    echo "   • You may also want to disable the audible bell in Terminal → Settings → Advanced"
+    read -n 1 -r -s -p $'Press any key once you’ve reviewed these suggestions...\n'
+    echo ""
 
   elif [[ "$platform" == "linux" || "$platform" == "redhat" ]]; then
     if [ -d "$HOME/.fzf" ]; then
@@ -122,28 +128,59 @@ install_fzf() {
 }
 
 # Install zsh plugins
+# Install zsh plugins
 install_zsh_plugins() {
   mkdir -p ~/.zsh
 
-  if [ ! -d "${HOME}/.zsh/zsh-syntax-highlighting" ]; then
-    echo "✨ Installing zsh-syntax-highlighting..."
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${HOME}/.zsh/zsh-syntax-highlighting"
-  fi
+  echo "🔌 Installing Zsh plugins..."
 
-  if [ ! -d "${HOME}/.zsh/zsh-autosuggestions" ]; then
-    echo "💡 Installing zsh-autosuggestions..."
-    git clone https://github.com/zsh-users/zsh-autosuggestions "${HOME}/.zsh/zsh-autosuggestions"
-  fi
+  if [[ "$platform" == "mac" ]]; then
+    # Install zsh-syntax-highlighting via Homebrew
+    if brew list zsh-syntax-highlighting &>/dev/null; then
+      echo "✅ zsh-syntax-highlighting already installed via Homebrew"
+    else
+      echo "✨ Installing zsh-syntax-highlighting via Homebrew..."
+      brew install zsh-syntax-highlighting
+    fi
 
-  if [ "$platform" = "mac" ]; then
-    if ! brew list pure &>/dev/null; then
-      echo "🌟 Installing pure via Homebrew..."
+    # Install zsh-autosuggestions via Homebrew
+    if brew list zsh-autosuggestions &>/dev/null; then
+      echo "✅ zsh-autosuggestions already installed via Homebrew"
+    else
+      echo "💡 Installing zsh-autosuggestions via Homebrew..."
+      brew install zsh-autosuggestions
+    fi
+
+    # Install pure via Homebrew
+    if brew list pure &>/dev/null; then
+      echo "✅ pure prompt already installed via Homebrew"
+    else
+      echo "🌟 Installing pure prompt via Homebrew..."
       brew install pure
     fi
+
   else
+    # Install manually on Linux/RedHat
+
+    if [ ! -d "${HOME}/.zsh/zsh-syntax-highlighting" ]; then
+      echo "✨ Installing zsh-syntax-highlighting..."
+      git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${HOME}/.zsh/zsh-syntax-highlighting"
+    else
+      echo "✅ zsh-syntax-highlighting already installed"
+    fi
+
+    if [ ! -d "${HOME}/.zsh/zsh-autosuggestions" ]; then
+      echo "💡 Installing zsh-autosuggestions..."
+      git clone https://github.com/zsh-users/zsh-autosuggestions "${HOME}/.zsh/zsh-autosuggestions"
+    else
+      echo "✅ zsh-autosuggestions already installed"
+    fi
+
     if [ ! -d "${HOME}/.zsh/pure" ]; then
       echo "🌟 Installing pure prompt manually..."
       git clone https://github.com/sindresorhus/pure.git "${HOME}/.zsh/pure"
+    else
+      echo "✅ pure prompt already installed"
     fi
   fi
 }
@@ -160,6 +197,14 @@ install_snazzy_theme() {
 if [[ "$1" == "uninstall" ]]; then
     echo "⚠️  Starting dotfiles uninstall..."
 
+    echo "📌 NOTE: This will NOT uninstall core packages (git, zsh, curl) or Homebrew itself."
+    echo "🧹 It will remove:"
+    echo "   • Dotfile symlinks (if managed by this script)"
+    echo "   • Zsh plugins (manual installs on Linux/RedHat, Homebrew installs on macOS)"
+    echo "   • fzf (via Homebrew on macOS or manually cloned on Linux)"
+    echo "   • Snazzy terminal theme (partially — manual cleanup may still be needed)"
+    echo ""
+
     for filename in "${FILES_TO_LINK[@]}"; do
         target="$HOME/$filename"
         if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$DOTFILES_DIR/"* ]]; then
@@ -173,17 +218,37 @@ if [[ "$1" == "uninstall" ]]; then
         fi
     done
 
+    # Function to safely attempt Homebrew uninstall
+    brew_uninstall() {
+      local pkg="$1"
+      if brew list "$pkg" &>/dev/null; then
+        echo "🔧 Uninstalling $pkg..."
+        if brew uninstall "$pkg" &>/dev/null; then
+          echo "✅ Uninstalled $pkg"
+        else
+          echo "⚠️  Could not uninstall $pkg — possibly required by another package"
+        fi
+      fi
+    }
+
     echo "🧹 Removing Zsh plugins..."
-    rm -rf ~/.zsh/zsh-syntax-highlighting ~/.zsh/zsh-autosuggestions ~/.zsh/pure
+
+    if [[ "$platform" == "mac" ]]; then
+        brew_uninstall zsh-syntax-highlighting
+        brew_uninstall zsh-autosuggestions
+        brew_uninstall pure
+    else
+        rm -rf ~/.zsh/zsh-syntax-highlighting ~/.zsh/zsh-autosuggestions ~/.zsh/pure
+        echo "✅ Removed manually-installed Zsh plugins"
+    fi
 
     echo "🧹 Removing fzf..."
-    if [[ "$platform" == "linux" ]]; then
+    if [[ "$platform" == "linux" || "$platform" == "redhat" ]]; then
         rm -rf ~/.fzf
         echo "⚠️  GNOME Terminal theme was not automatically reverted."
         echo "📝 To remove Snazzy: open GNOME Terminal → Preferences → Profiles and switch to a different theme or delete the Snazzy profile manually."
     elif [[ "$platform" == "mac" ]]; then
-        brew uninstall fzf &>/dev/null || true
-        brew uninstall pure &>/dev/null || true
+        brew_uninstall fzf
         echo "⚠️  Terminal theme was not automatically reverted."
         echo "📝 To remove Snazzy: open Terminal → Settings → Profiles and switch or delete manually."
     fi
