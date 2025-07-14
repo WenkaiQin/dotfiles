@@ -35,53 +35,38 @@ backup_file() {
 
 # Install base packages.
 install_packages() {
+  
   echo "📦 Installing required packages..."
-
   if [[ "$platform" == "linux" ]]; then
-    REQUIRED_PKGS=(zsh git curl)
+    PKG_MGR="apt"
+    INSTALL_CMD="sudo apt install -y"
     sudo apt update
-    for pkg in "${REQUIRED_PKGS[@]}"; do
-      if command -v "$pkg" &>/dev/null; then
-        echo "✅ $pkg already installed"
-      else
-        echo "📦 Installing $pkg..."
-        sudo apt install -y "$pkg"
-      fi
-    done
 
   elif [[ "$platform" == "redhat" ]]; then
-    REQUIRED_PKGS=(zsh git curl)
-    if command -v dnf &>/dev/null; then
-      PKG_MGR=dnf
-    else
-      PKG_MGR=yum
-    fi
+
+    PKG_MGR=$(command -v dnf &>/dev/null && echo "dnf" || echo "yum")
+    INSTALL_CMD="sudo $PKG_MGR install -y"
     sudo $PKG_MGR -y makecache
-    for pkg in "${REQUIRED_PKGS[@]}"; do
-      if command -v "$pkg" &>/dev/null; then
-        echo "✅ $pkg already installed"
-      else
-        echo "📦 Installing $pkg..."
-        sudo $PKG_MGR install -y "$pkg"
-      fi
-    done
 
   elif [[ "$platform" == "mac" ]]; then
-    REQUIRED_PKGS=(git curl)
+    REQUIRED_PKGS=(git curl)  # zsh is preinstalled and managed separately on macOS
     if ! command -v brew &>/dev/null; then
       echo "🍺 Installing Homebrew..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-
-    for pkg in "${REQUIRED_PKGS[@]}"; do
-      if brew list "$pkg" &>/dev/null; then
-        echo "✅ $pkg already installed"
-      else
-        echo "📦 Installing $pkg..."
-        brew install "$pkg"
-      fi
-    done
+    PKG_MGR="brew"
+    INSTALL_CMD="brew install"
   fi
+
+  for pkg in "${REQUIRED_PKGS[@]}"; do
+    if command -v "$pkg" &>/dev/null; then
+      echo "✅ $pkg already installed"
+    else
+      echo "📦 Installing $pkg..."
+      $INSTALL_CMD "$pkg"
+    fi
+  done
+
 }
 
 # Install fzf
