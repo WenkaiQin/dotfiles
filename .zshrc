@@ -42,7 +42,7 @@ if command -v fzf &>/dev/null; then
     # completions.
     fzf_version=$(fzf --version | awk '{print $1}')
     min_version="0.48"
-    if [[ "$(printf '%s\n' "$fzf_version" "$min_version" | sort -V | head -n1)" == "$min_version" ]]; then
+    if [[ "$(printf '%s\n' "$fzf_version" "$min_version" | sort -V | head -n1)" != "$min_version" ]]; then
         echo "⚠️  fzf version $fzf_version is less than $min_version - key bindings and completions may not be available."
     fi
 
