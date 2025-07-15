@@ -1,6 +1,8 @@
 # De-duplicate fpath. Just in case!
 typeset -U fpath 
-fpath+=("$(brew --prefix)/share/zsh/site-functions")
+if command -v brew &>/dev/null; then
+  fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fi
 
 # Setup Zsh completion cache. Then, load compinit with cache support.
 ZSH_CACHE_DIR="$HOME/.zsh/cache"
@@ -40,7 +42,7 @@ if command -v fzf &>/dev/null; then
     # completions.
     fzf_version=$(fzf --version | awk '{print $1}')
     min_version="0.48"
-    if [[ "$(printf '%s\n' "$min_version" "$fzf_version" | sort -V | head -n1)" != "$min_version" ]]; then
+    if [[ "$(printf '%s\n' "$fzf_version" "$min_version" | sort -V | head -n1)" == "$min_version" ]]; then
         echo "⚠️  fzf version $fzf_version is less than $min_version - key bindings and completions may not be available."
     fi
 
@@ -89,13 +91,17 @@ fi
 
 autoload -Uz promptinit; promptinit;
 zstyle :prompt:pure:git:stash show yes
-prompt pure
+if type prompt_pure_setup &>/dev/null; then
+  prompt pure
+fi
 
 # Syntax highlighting.
 if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+elif [[ -f "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  source "$HOME/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 # History settings.
