@@ -1,5 +1,6 @@
 # De-duplicate fpath. Just in case!
 typeset -U fpath 
+fpath+=("$(brew --prefix)/share/zsh/site-functions")
 
 # Setup Zsh completion cache. Then, load compinit with cache support.
 ZSH_CACHE_DIR="$HOME/.zsh/cache"

@@ -115,40 +115,32 @@ install_fzf() {
 # Install Zsh plugins
 install_zsh_plugins() {
   echo "🔌 Installing Zsh plugins..."
-
   mkdir -p ~/.zsh
-
-  # Define plugins and install methods
+  PLUGIN_NAMES=("zsh-syntax-highlighting" "zsh-autosuggestions" "pure")
+  PLUGIN_URLS=(
+    "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    "https://github.com/zsh-users/zsh-autosuggestions.git"
+    "https://github.com/sindresorhus/pure.git"
+  )
   if [[ "$platform" == "mac" ]]; then
-    declare -A HOMEBREW_PLUGINS=(
-      [zsh-syntax-highlighting]="✨"
-      [zsh-autosuggestions]="💡"
-      [pure]="🌟"
-    )
-
-    for plugin in "${!HOMEBREW_PLUGINS[@]}"; do
+    for plugin in "${PLUGIN_NAMES[@]}"; do
       if brew list "$plugin" &>/dev/null; then
         echo "✅ $plugin already installed via Homebrew"
       else
-        echo "${HOMEBREW_PLUGINS[$plugin]} Installing $plugin via Homebrew..."
+        echo "📦 Installing $plugin via Homebrew..."
         brew install "$plugin"
       fi
     done
-
   else
-    declare -A GIT_PLUGINS=(
-      [zsh-syntax-highlighting]="https://github.com/zsh-users/zsh-syntax-highlighting.git"
-      [zsh-autosuggestions]="https://github.com/zsh-users/zsh-autosuggestions.git"
-      [pure]="https://github.com/sindresorhus/pure.git"
-    )
-
-    for plugin in "${!GIT_PLUGINS[@]}"; do
-      local target="${HOME}/.zsh/$plugin"
+    for i in "${!PLUGIN_NAMES[@]}"; do
+      plugin="${PLUGIN_NAMES[$i]}"
+      url="${PLUGIN_URLS[$i]}"
+      target="$HOME/.zsh/$plugin"
       if [[ -d "$target" ]]; then
         echo "✅ $plugin already installed"
       else
         echo "⬇️  Installing $plugin..."
-        git clone "${GIT_PLUGINS[$plugin]}" "$target"
+        git clone "$url" "$target"
       fi
     done
   fi
@@ -161,70 +153,6 @@ install_snazzy_theme() {
         echo "⚠️  Warning: Snazzy theme installation failed or was skipped. You can try again by running install_snazzy."
     fi
 }
-
-# Uninstall option.
-if [[ "$1" == "uninstall" ]]; then
-    echo "⚠️  Starting dotfiles uninstall..."
-
-    echo "📌 NOTE: This will NOT uninstall core packages (git, zsh, curl) or Homebrew itself."
-    echo "🧹 It will remove:"
-    echo "   • Dotfile symlinks (if managed by this script)"
-    echo "   • Zsh plugins (manual installs on Linux/RedHat, Homebrew installs on macOS)"
-    echo "   • fzf (via Homebrew on macOS or manually cloned on Linux)"
-    echo "   • Snazzy terminal theme (partially — manual cleanup may still be needed)"
-    echo ""
-
-    for filename in "${FILES_TO_LINK[@]}"; do
-        target="$HOME/$filename"
-        if [[ -L "$target" ]] && [[ "$(readlink "$target")" == "$DOTFILES_DIR/"* ]]; then
-            echo "❌ Removing symlink: $target"
-            rm "$target"
-            if ls "$target".bak.* &>/dev/null; then
-                latest_backup=$(ls "$target".bak.* | sort | tail -n 1)
-                echo "🔁 Restoring backup: $latest_backup → $target"
-                mv "$latest_backup" "$target"
-            fi
-        fi
-    done
-
-    # Function to safely attempt Homebrew uninstall
-    brew_uninstall() {
-      local pkg="$1"
-      if brew list "$pkg" &>/dev/null; then
-        echo "🔧 Uninstalling $pkg..."
-        if brew uninstall "$pkg" &>/dev/null; then
-          echo "✅ Uninstalled $pkg"
-        else
-          echo "⚠️  Could not uninstall $pkg — possibly required by another package"
-        fi
-      fi
-    }
-
-    echo "🧹 Removing Zsh plugins..."
-
-    if [[ "$platform" == "mac" ]]; then
-        brew_uninstall zsh-syntax-highlighting
-        brew_uninstall zsh-autosuggestions
-        brew_uninstall pure
-    else
-        rm -rf ~/.zsh/zsh-syntax-highlighting ~/.zsh/zsh-autosuggestions ~/.zsh/pure
-        echo "✅ Removed manually-installed Zsh plugins"
-    fi
-
-    echo "🧹 Removing fzf..."
-    if [[ "$platform" == "linux" || "$platform" == "redhat" ]]; then
-        rm -rf ~/.fzf
-        echo "⚠️  GNOME Terminal theme was not automatically reverted."
-        echo "📝 To remove Snazzy: open GNOME Terminal → Preferences → Profiles and switch to a different theme or delete the Snazzy profile manually."
-    elif [[ "$platform" == "mac" ]]; then
-        brew_uninstall fzf
-        echo "⚠️  Terminal theme was not automatically reverted."
-        echo "📝 To remove Snazzy: open Terminal → Settings → Profiles and switch or delete manually."
-    fi
-
-    echo "❌ Dotfiles uninstallation complete."
-    exit 0
-fi
 
 # Install packages, zshplugins, and fzf
 install_packages
