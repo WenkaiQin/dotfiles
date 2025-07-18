@@ -49,7 +49,7 @@ install_packages() {
     sudo $PKG_MGR -y makecache
 
   elif [[ "$platform" == "mac" ]]; then
-    REQUIRED_PKGS=(git curl)  # zsh is preinstalled and managed separately on macOS
+    REQUIRED_PKGS=(git curl tree)  # zsh is preinstalled and managed separately on macOS
     if ! command -v brew &>/dev/null; then
       echo "🍺 Installing Homebrew..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
