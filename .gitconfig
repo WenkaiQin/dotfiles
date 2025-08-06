@@ -10,9 +10,10 @@
 	ui = auto
 [pull]
 	ff = only
+	rebase = true
 [include]
 	path = ~/.gitconfig.local
 [diff]
 	ignoreWhitespace = true
-[ini]
+[init]
 	defaultBranch = master
